@@ -3,8 +3,6 @@ package com.personalproject.GestionIncidencias.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
 @Getter
 @Setter
 @Entity
