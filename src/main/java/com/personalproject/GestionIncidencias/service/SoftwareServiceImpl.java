@@ -4,6 +4,7 @@ import com.personalproject.GestionIncidencias.dto.request.SoftwareDTORequest;
 import com.personalproject.GestionIncidencias.dto.response.SoftwareDTOResponse;
 import com.personalproject.GestionIncidencias.exception.ResourceNotFoundException;
 import com.personalproject.GestionIncidencias.mapper.SoftMapper;
+import com.personalproject.GestionIncidencias.validate.SoftwareValidator;
 import lombok.RequiredArgsConstructor;
 import com.personalproject.GestionIncidencias.model.Software;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SoftwareServiceImpl implements SoftwareService {
 
+    private final SoftwareValidator softwareValidator;
     private final SoftwareRepository softwareRepository;
     private final SoftMapper softMapper;
 
@@ -31,6 +33,7 @@ public class SoftwareServiceImpl implements SoftwareService {
 
     @Override
     public SoftwareDTOResponse createSoftware(SoftwareDTORequest soft) {
+        softwareValidator.validateNotExists(soft.getName());
         Software software = softMapper.toEntity(soft);
         return softMapper.toResponse(softwareRepository.save(software));
     }
