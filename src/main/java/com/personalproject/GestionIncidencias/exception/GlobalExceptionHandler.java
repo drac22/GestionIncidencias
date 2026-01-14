@@ -34,7 +34,6 @@ public class GlobalExceptionHandler {
                 .error(HttpStatus.BAD_REQUEST.name())
                 .message(ex.getMessage())
                 .path(request.getRequestURI())
-                .fieldErrors(ex.getFieldErrors())
                 .build());
     }
 
@@ -55,7 +54,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ApiError> handleNoResourceFound(NoResourceFoundException ex, HttpServletRequest request) {
-
         ApiError error = ApiError.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.NOT_FOUND.value())
@@ -63,7 +61,6 @@ public class GlobalExceptionHandler {
                 .message("Endpoint no encontrado")
                 .path(request.getRequestURI())
                 .build();
-
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 }
