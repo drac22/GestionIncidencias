@@ -9,6 +9,7 @@ import java.util.Set;
 @Getter
 @Setter
 public class UserDTOResponse {
+    private Long id;
     private String email;
     private Set<Role> roles;
     private boolean enabled;
