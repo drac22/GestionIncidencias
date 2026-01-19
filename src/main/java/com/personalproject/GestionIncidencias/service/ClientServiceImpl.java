@@ -100,4 +100,9 @@ public class ClientServiceImpl implements ClientService{
         Client clientExist = clientRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cliente con ID: " + id + " no encontrado"));
         clientRepository.delete(clientExist);
     }
+
+    @Override
+    public Client getEntityById(Long id) {
+        return clientRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cliente con ID: " + id + " no encontrado"));
+    }
 }
