@@ -1,0 +1,27 @@
+services:
+  backend:
+    build: .
+    container_name: backend_incidencia
+    environment:
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      db_incidencias:
+        condition: service_healthy
+
+  db_incidencias:
+    image: mysql:8.0
+    container_name: db_incidencia
+    environment:
+      MYSQL_DATABASE: db_incidencias
+      MYSQL_ROOT_PASSWORD: root
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - data:/var/lib/mysql
+volumes:
+  data:
