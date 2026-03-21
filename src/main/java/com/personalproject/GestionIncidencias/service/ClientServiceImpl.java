@@ -17,6 +17,7 @@ import com.personalproject.GestionIncidencias.repository.SoftwareRepository;
 import com.personalproject.GestionIncidencias.repository.UserRepository;
 import com.personalproject.GestionIncidencias.validate.ClientValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +31,7 @@ public class ClientServiceImpl implements ClientService{
     private final SoftwareRepository softwareRepository;
     private final ClientRepository clientRepository;
     private final UserRepository userRepository;
-
+    private final PasswordEncoder passwordEncoder;
     private final ClientValidator clientValidator;
     private final ClientMapper clientMapper;
     private final UserMapper userMapper;
@@ -66,6 +67,7 @@ public class ClientServiceImpl implements ClientService{
     public ClientDTOResponse createClient(ClientRegistrationDTORequest request) {
         clientValidator.validateForCreation(request);
         User user = userMapper.toEntity(request.getUser());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(Set.of(Role.ROLE_CLIENT));
         user.setEnabled(true);
         userRepository.save(user);

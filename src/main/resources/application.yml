@@ -6,3 +6,6 @@ spring:
     name: GestionIncidencias
   profiles:
     active: local
+jwt:
+  secret: clave-super-secreta-de-minimo-256-bits-para-hmac
+  expiration: 3600000
