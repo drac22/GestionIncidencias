@@ -1,10 +1,22 @@
 spring:
+  config:
+    # Lee las variables del archivo .env de la raíz del proyecto (si existe)
+    import: optional:file:.env[.properties]
   datasource:
-    url: jdbc:mysql://localhost:3306/db_incidencias
-    username: root
-    password: root
+    url: jdbc:mysql://localhost:3306/db_incidencias?createDatabaseIfNotExist=true
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
 
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+# Valores solo para desarrollo local. En Docker/producción se usan variables de entorno
+jwt:
+  secret: ${JWT_SECRET:clave-local-solo-para-desarrollo-de-32-caracteres-o-mas}
+
+app:
+  admin:
+    email: ${ADMIN_EMAIL:admin@incidencias.local}
+    password: ${ADMIN_PASSWORD:admin12345}

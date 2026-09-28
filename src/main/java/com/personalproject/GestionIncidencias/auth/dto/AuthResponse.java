@@ -1,12 +1,12 @@
 package com.personalproject.GestionIncidencias.auth.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
-@AllArgsConstructor
-public class AuthResponse {
-    private String token;
+public record AuthResponse(
+        String accessToken,
+        String refreshToken,
+        String tokenType,
+        long expiresIn
+) {
+    public AuthResponse(String accessToken, String refreshToken, long expiresIn) {
+        this(accessToken, refreshToken, "Bearer", expiresIn);
+    }
 }

@@ -1,4 +1,4 @@
-package com.personalproject.GestionIncidencias.auth;
+package com.personalproject.GestionIncidencias.security;
 
 import com.personalproject.GestionIncidencias.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +15,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("No se encontro el email"));
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("No se encontró el usuario con email: " + email));
     }
 }
