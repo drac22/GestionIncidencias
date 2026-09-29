@@ -6,6 +6,9 @@ spring:
     name: GestionIncidencias
   profiles:
     active: local
+  jpa:
+    # Las relaciones LAZY se cargan dentro de los servicios (@Transactional), no en los controladores
+    open-in-view: false
 
 jwt:
   # Mínimo 32 caracteres. Se define por variable de entorno, nunca en el repositorio

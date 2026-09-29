@@ -6,10 +6,11 @@ import com.personalproject.GestionIncidencias.enums.StateSolicitud;
 import com.personalproject.GestionIncidencias.exception.ResourceNotFoundException;
 import com.personalproject.GestionIncidencias.mapper.SolicitudMapper;
 import com.personalproject.GestionIncidencias.model.Solicitud;
+import com.personalproject.GestionIncidencias.model.User;
 import com.personalproject.GestionIncidencias.repository.SolicitudRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,10 +20,11 @@ import java.util.List;
 public class SolicitudServiceImpl implements SolicitudService{
 
     private final SolicitudRepository solicitudRepository;
-    private final ClientServiceImpl clientServiceImpl;
+    private final ClientService clientService;
     private final SolicitudMapper solicitudMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public List<SolicitudDTOResponse> findAllSolicitud() {
         return solicitudRepository.findAll()
                 .stream()
@@ -31,17 +33,19 @@ public class SolicitudServiceImpl implements SolicitudService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public SolicitudDTOResponse findById(Long id) {
         return solicitudMapper.toDTO(getEntityById(id));
     }
 
     @Transactional
     @Override
-    public SolicitudDTOResponse createSolicitud(SolicitudDTORequest request) {
+    public SolicitudDTOResponse createSolicitud(SolicitudDTORequest request, User user) {
         Solicitud solicitud = solicitudMapper.toEntity(request);
         solicitud.setCreatedAt(LocalDateTime.now());
         solicitud.setStateSolicitud(StateSolicitud.EN_ESPERA);
-        solicitud.setClient(clientServiceImpl.getEntityById(request.getClient()));
+        // El cliente es siempre el usuario autenticado: nadie puede crear solicitudes a nombre de otro
+        solicitud.setClient(clientService.getEntityByUserId(user.getId()));
         solicitudRepository.save(solicitud);
         return solicitudMapper.toDTO(solicitud);
     }

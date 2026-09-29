@@ -40,7 +40,7 @@ public class Client {
     @Column(nullable = false)
     private ClientType typeClient;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 

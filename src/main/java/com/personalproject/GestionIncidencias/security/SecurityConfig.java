@@ -47,8 +47,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/software/**").authenticated()
                         .requestMatchers("/api/software/**").hasRole(ADMIN)
 
-                        // Solicitudes: el cliente las crea, ADMIN y colaboradores las gestionan
-                        .requestMatchers(HttpMethod.POST, "/api/solicitud").hasAnyRole(CLIENT, ADMIN)
+                        // Solicitudes: el cliente las crea (a su nombre), ADMIN y colaboradores las gestionan
+                        .requestMatchers(HttpMethod.POST, "/api/solicitud").hasRole(CLIENT)
                         .requestMatchers(HttpMethod.GET, "/api/solicitud/**").hasAnyRole(ADMIN, COLLABORATOR)
 
                         // Administración

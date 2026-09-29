@@ -15,6 +15,6 @@ public class Software {
     @Column(name = "id_software")
     private Long id;
 
-    @Column(name = "name_software", nullable = false, length = 100)
+    @Column(name = "name_software", nullable = false, unique = true, length = 100)
     private String name;
 }

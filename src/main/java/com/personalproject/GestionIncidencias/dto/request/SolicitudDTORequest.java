@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+// El cliente no viene en el body: se obtiene del usuario autenticado
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,7 +18,4 @@ public class SolicitudDTORequest {
 
     @NotNull
     private TypeSolicitud typeSolicitud;
-
-    @NotNull
-    private Long client;
 }

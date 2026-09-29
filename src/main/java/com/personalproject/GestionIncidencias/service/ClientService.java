@@ -1,6 +1,5 @@
 package com.personalproject.GestionIncidencias.service;
 
-import com.personalproject.GestionIncidencias.dto.request.ClientDTORequest;
 import com.personalproject.GestionIncidencias.dto.request.ClientRegistrationDTORequest;
 import com.personalproject.GestionIncidencias.dto.response.ClientDTOResponse;
 import com.personalproject.GestionIncidencias.model.Client;
@@ -13,4 +12,5 @@ public interface ClientService {
     ClientDTOResponse createClient(ClientRegistrationDTORequest request);
     void deleteClient(Long id);
     Client getEntityById(Long id);
+    Client getEntityByUserId(Long userId);
 }
