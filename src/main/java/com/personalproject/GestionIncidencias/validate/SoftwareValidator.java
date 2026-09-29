@@ -16,4 +16,11 @@ public class SoftwareValidator {
             throw new BadRequestException("El nombre del software ya existe");
         }
     }
+
+    // Al editar, el nombre puede repetirse solo si es el del mismo software
+    public void validateNameAvailable(String name, Long softwareId){
+        if (softwareRepository.existsByNameAndIdNot(name, softwareId)){
+            throw new BadRequestException("El nombre del software ya existe");
+        }
+    }
 }

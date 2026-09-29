@@ -2,11 +2,13 @@ package com.personalproject.GestionIncidencias.controller;
 
 import com.personalproject.GestionIncidencias.dto.request.SolicitudDTORequest;
 import com.personalproject.GestionIncidencias.dto.response.SolicitudDTOResponse;
+import com.personalproject.GestionIncidencias.model.User;
 import com.personalproject.GestionIncidencias.service.SolicitudService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,8 +30,10 @@ public class SolicitudController {
         return ResponseEntity.ok(solicitudService.findById(id));
     }
 
+    // @AuthenticationPrincipal inyecta el usuario que viene en el token JWT
     @PostMapping
-    public ResponseEntity<SolicitudDTOResponse> createSolicitud(@RequestBody @Valid SolicitudDTORequest request){
-        return ResponseEntity.status(HttpStatus.CREATED).body(solicitudService.createSolicitud(request));
+    public ResponseEntity<SolicitudDTOResponse> createSolicitud(@RequestBody @Valid SolicitudDTORequest request,
+                                                                @AuthenticationPrincipal User user){
+        return ResponseEntity.status(HttpStatus.CREATED).body(solicitudService.createSolicitud(request, user));
     }
 }

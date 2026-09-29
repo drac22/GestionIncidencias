@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -27,10 +28,11 @@ public class Collaborator {
     @Enumerated(EnumType.STRING)
     private Occupation occupation;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_user")
     private User user;
 
-    @OneToMany(mappedBy = "collaborator", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Asignacion> asignaciones;
+    // Sin cascade: borrar un colaborador no debe borrar el historial de asignaciones
+    @OneToMany(mappedBy = "collaborator")
+    private List<Asignacion> asignaciones = new ArrayList<>();
 }

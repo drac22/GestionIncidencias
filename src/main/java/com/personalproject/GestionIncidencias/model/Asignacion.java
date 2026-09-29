@@ -17,11 +17,11 @@ public class Asignacion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "solicitud_id", nullable = false)
     private Solicitud solicitud;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "collaborator_id", nullable = false)
     private Collaborator collaborator;
 

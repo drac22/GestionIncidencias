@@ -33,7 +33,7 @@ public class Solicitud {
     @Enumerated(EnumType.STRING)
     private TypeSolicitud typeSolicitud;
 
-    @ManyToOne
-    @JoinColumn(name = "client_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 }

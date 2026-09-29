@@ -2,11 +2,10 @@ package com.personalproject.GestionIncidencias.service;
 
 import com.personalproject.GestionIncidencias.dto.request.ClientRegistrationDTORequest;
 import com.personalproject.GestionIncidencias.dto.response.ClientDTOResponse;
-import com.personalproject.GestionIncidencias.dto.response.SoftwareDTOResponse;
 import com.personalproject.GestionIncidencias.enums.Role;
+import com.personalproject.GestionIncidencias.exception.ConflictException;
 import com.personalproject.GestionIncidencias.exception.ResourceNotFoundException;
 import com.personalproject.GestionIncidencias.mapper.ClientMapper;
-import com.personalproject.GestionIncidencias.mapper.SoftMapper;
 import com.personalproject.GestionIncidencias.mapper.UserMapper;
 import com.personalproject.GestionIncidencias.model.Client;
 import com.personalproject.GestionIncidencias.model.ClientSoftware;
@@ -14,6 +13,7 @@ import com.personalproject.GestionIncidencias.model.Software;
 import com.personalproject.GestionIncidencias.model.User;
 import com.personalproject.GestionIncidencias.repository.ClientRepository;
 import com.personalproject.GestionIncidencias.repository.SoftwareRepository;
+import com.personalproject.GestionIncidencias.repository.SolicitudRepository;
 import com.personalproject.GestionIncidencias.repository.UserRepository;
 import com.personalproject.GestionIncidencias.validate.ClientValidator;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -30,36 +31,27 @@ public class ClientServiceImpl implements ClientService{
 
     private final SoftwareRepository softwareRepository;
     private final ClientRepository clientRepository;
+    private final SolicitudRepository solicitudRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final ClientValidator clientValidator;
     private final ClientMapper clientMapper;
     private final UserMapper userMapper;
-    private final SoftMapper softMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public List<ClientDTOResponse> getListClient() {
         return clientRepository.findAll()
                 .stream()
-                .map(client -> {
-                    ClientDTOResponse response = clientMapper.toResponse(client);
-                    List<SoftwareDTOResponse> softwares = client.getSoftwares()
-                            .stream()
-                            .map(cs -> softMapper.toResponse(cs.getSoftware()))
-                            .toList();
-                    response.setSoftwares(softwares);
-                    return response;
-                })
+                .map(clientMapper::toResponse)
                 .toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ClientDTOResponse getClientById(Long id) {
-        Client client = clientRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cliente con ID: " + id + " no encontrado"));
-        ClientDTOResponse response = clientMapper.toResponse(client);
-        List<SoftwareDTOResponse> softwares = client.getSoftwares().stream().map(cs -> softMapper.toResponse(cs.getSoftware())).toList();
-        response.setSoftwares(softwares);
-        return response;
+        return clientMapper.toResponse(getEntityById(id));
     }
 
     @Override
@@ -73,9 +65,9 @@ public class ClientServiceImpl implements ClientService{
         userRepository.save(user);
         Client client = clientMapper.toEntity(request.getClient());
         if (request.getClient().getSoftwares() != null) {
-            for (Long dto : request.getClient().getSoftwares()) {
-                Software software = softwareRepository.findById(dto)
-                        .orElseThrow(() -> new ResourceNotFoundException("Software con ID: " + dto + " no encontrado"));
+            for (Long softwareId : request.getClient().getSoftwares()) {
+                Software software = softwareRepository.findById(softwareId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Software con ID: " + softwareId + " no encontrado"));
                 ClientSoftware cs = new ClientSoftware();
                 cs.setClient(client);
                 cs.setSoftware(software);
@@ -85,26 +77,32 @@ public class ClientServiceImpl implements ClientService{
         }
         client.setUser(user);
         clientRepository.save(client);
-        List<SoftwareDTOResponse> softwareResponses =
-                client.getSoftwares().stream()
-                        .map(cs -> SoftwareDTOResponse.builder()
-                                .id(cs.getSoftware().getId())
-                                .name(cs.getSoftware().getName())
-                                .build())
-                        .toList();
-        ClientDTOResponse clientDTOResponse = clientMapper.toResponse(client);
-        clientDTOResponse.setSoftwares(softwareResponses);
-        return clientDTOResponse;
+        return clientMapper.toResponse(client);
     }
 
     @Override
+    @Transactional
     public void deleteClient(Long id) {
-        Client clientExist = clientRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cliente con ID: " + id + " no encontrado"));
-        clientRepository.delete(clientExist);
+        Client client = getEntityById(id);
+        if (solicitudRepository.existsByClientId(id)) {
+            throw new ConflictException("No se puede eliminar el cliente porque tiene solicitudes registradas");
+        }
+        User user = client.getUser();
+        clientRepository.delete(client);
+        // Sin su perfil de cliente, la cuenta no debe poder seguir iniciando sesión
+        if (user != null) {
+            userService.deleteUser(user);
+        }
     }
 
     @Override
     public Client getEntityById(Long id) {
         return clientRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cliente con ID: " + id + " no encontrado"));
+    }
+
+    @Override
+    public Client getEntityByUserId(Long userId) {
+        return clientRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("El usuario no tiene un perfil de cliente"));
     }
 }
