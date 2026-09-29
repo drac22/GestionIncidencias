@@ -13,6 +13,7 @@ import com.personalproject.GestionIncidencias.repository.UserRepository;
 import com.personalproject.GestionIncidencias.validate.UserValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,6 +28,7 @@ public class CollaboratorServiceImpl implements CollaboratorService{
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final UserValidator userValidator;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public List<CollaboratorDTOResponse> findAll(){
@@ -47,6 +49,7 @@ public class CollaboratorServiceImpl implements CollaboratorService{
         userValidator.validateNotExistEmail(request.getUser().getEmail());
 
         User user = userMapper.toEntity(request.getUser());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(Set.of(Role.ROLE_COLLABORATOR));
         user.setEnabled(true);
         userRepository.save(user);

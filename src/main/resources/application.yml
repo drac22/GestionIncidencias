@@ -6,3 +6,14 @@ spring:
     name: GestionIncidencias
   profiles:
     active: local
+
+jwt:
+  # Mínimo 32 caracteres. Se define por variable de entorno, nunca en el repositorio
+  secret: ${JWT_SECRET}
+  access-token-expiration: 15m
+  refresh-token-expiration: 7d
+
+app:
+  admin:
+    email: ${ADMIN_EMAIL:}
+    password: ${ADMIN_PASSWORD:}

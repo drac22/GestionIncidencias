@@ -6,6 +6,11 @@ services:
       DB_USERNAME: root
       DB_PASSWORD: root
       SPRING_PROFILES_ACTIVE: docker
+      JWT_SECRET: ${JWT_SECRET:?Define JWT_SECRET en el archivo .env}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+    ports:
+      - "8080:8080"
     depends_on:
       db_incidencias:
         condition: service_healthy
